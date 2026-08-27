@@ -1,0 +1,56 @@
+[
+  {
+    "id": "p1",
+    "name": "Fresh Organic Milk",
+    "description": "Whole organic milk from grass-fed cows. Rich in calcium and vitamins.",
+    "price": 4.99,
+    "image": "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=400&q=80",
+    "category": "Dairy",
+    "stock": 10
+  },
+  {
+    "id": "p2",
+    "name": "Artisan Sourdough Bread",
+    "description": "Freshly baked sourdough bread with a crispy crust and chewy center.",
+    "price": 5.49,
+    "image": "https://images.unsplash.com/photo-1589367920969-ab8e050bf0ef?auto=format&fit=crop&w=400&q=80",
+    "category": "Bakery",
+    "stock": 5
+  },
+  {
+    "id": "p3",
+    "name": "Organic Bananas",
+    "description": "Sweet and nutritious organic bananas, perfect for snacks or smoothies.",
+    "price": 1.99,
+    "image": "https://images.unsplash.com/photo-1571501478200-8c2901c5186b?auto=format&fit=crop&w=400&q=80",
+    "category": "Produce",
+    "stock": 20
+  },
+  {
+    "id": "p4",
+    "name": "Free-Range Eggs (Dozen)",
+    "description": "Large brown eggs from pasture-raised hens.",
+    "price": 6.99,
+    "image": "https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=400&q=80",
+    "category": "Dairy",
+    "stock": 12
+  },
+  {
+    "id": "p5",
+    "name": "Avocado",
+    "description": "Ripe Hass avocado, great for guacamole or avocado toast.",
+    "price": 2.49,
+    "image": "https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=400&q=80",
+    "category": "Produce",
+    "stock": 0
+  },
+  {
+    "id": "p6",
+    "name": "Whole Bean Coffee",
+    "description": "Dark roast whole bean coffee with chocolate and caramel notes.",
+    "price": 14.99,
+    "image": "https://images.unsplash.com/photo-1559525839-b184a4d698c7?auto=format&fit=crop&w=400&q=80",
+    "category": "Pantry",
+    "stock": 8
+  }
+]
