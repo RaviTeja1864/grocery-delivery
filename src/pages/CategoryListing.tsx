@@ -18,6 +18,7 @@ export const CategoryListing = () => {
     api.getProducts().then((items) => {
       if (active) {
         setProducts(items.filter((item) => category.toLowerCase() === 'dairy' ? ['dairy', 'eggs'].includes(item.category.toLowerCase()) : item.category.toLowerCase() === category.toLowerCase()));
+        setError(false);
         setLoadedCategory(category);
       }
     }).catch(() => {
