@@ -1,21 +1,47 @@
 # Design Notes
 
-This document covers 3 key mobile-to-desktop design adaptation decisions made while building the responsive layout without access to a final Figma file.
+## Decision 1 - Mobile-first navigation
 
-## 1. Product Grid Scaling
-**Decision:** Instead of simply stretching mobile product cards across the desktop screen (which results in huge, ugly images), the grid dynamically scales from 1 column to 4 columns.
-**Reasoning:** 
-- Mobile (`grid-cols-1`): Users expect large, easily tappable touch targets and images that span the screen width.
-- Desktop (`lg:grid-cols-4`): A 4-column layout maximizes screen real estate, allowing users to browse more products simultaneously without excessive scrolling.
+### Problem
+The Figma uses a fixed five-item mobile navigation while desktop needs more horizontal space and a different interaction pattern.
 
-## 2. Category Filters Navigation
-**Decision:** Category filters are implemented as a horizontal scrolling list (`overflow-x-auto`) on mobile, but flex-wrap normally on desktop.
-**Reasoning:**
-- Mobile: Vertical space is premium. A horizontal swipeable list of pills keeps the filters accessible without pushing the main product content below the fold.
-- Desktop: Mouse users generally dislike horizontal scrolling. By letting the pills wrap naturally or using adequate spacing, it becomes easier to click with a mouse.
+### Decision
+`MobileBottomNav` renders Shop, Explore, Cart, Favourite, and Account with Lucide line icons. It is fixed to the mobile viewport, hidden at the `md` breakpoint, and the shared `Layout` keeps a separate desktop navigation row.
 
-## 3. Cart Layout Architecture
-**Decision:** The Cart page stacks the Item List and Order Summary vertically on mobile, but places them side-by-side (`lg:flex-row`) on desktop with a "sticky" order summary.
-**Reasoning:**
-- Mobile: A stacked layout is the only viable option due to screen width constraints.
-- Desktop: Stacking on desktop wastes massive horizontal space and forces users to scroll down just to see their total. A side-by-side layout with `sticky top-24` keeps the "Proceed to Checkout" button constantly visible on the right while the user scrolls through their long list of cart items on the left.
+### Reasoning
+The fixed bar keeps the primary grocery destinations available during vertical browsing. Route-aware matching also keeps product, category, and search pages associated with their parent destination.
+
+### Trade-off
+Mobile content needs bottom padding, and the navigation consumes some viewport height. Desktop gets a lighter header instead of duplicating the mobile bar.
+
+## Decision 2 - Responsive product layout
+
+### Problem
+The reference uses compact horizontally browsable product cards on mobile, while a desktop screen can show more products at once.
+
+### Decision
+`HorizontalProductRow` uses fixed-width cards in a horizontally scrollable row on mobile and becomes a four-column grid from the medium breakpoint upward. `ProductCard` owns all product rendering and the real Zustand add action.
+
+### Reasoning
+Fixed mobile card widths preserve readable product names and touch targets. The desktop grid increases product density without stretching cards to an awkward size.
+
+### Trade-off
+Mobile users scroll within sections as well as down the page. Desktop rows lose the horizontal browsing gesture in exchange for faster comparison.
+
+## Decision 3 - Desktop adaptation
+
+### Problem
+A phone-sized Figma cannot be stretched across a desktop without creating excessive whitespace or oversized controls.
+
+### Decision
+The app uses centered max-width containers, desktop navigation, multi-column product grids, and a side-by-side cart with a sticky order summary. Authentication screens retain a centered mobile-width layout on larger screens.
+
+### Reasoning
+These adaptations preserve the mobile visual language while using desktop space for comparison and checkout efficiency.
+
+### Trade-off
+Desktop does not reproduce the Figma frame literally. It prioritizes usable density and keeps the mobile hierarchy intact.
+
+## Decision 4 - Section composition
+
+Home is composed from reusable section headers, category tiles, and horizontal product rows. Each `See all` action routes to an existing category, Explore, or Search view instead of being decorative.

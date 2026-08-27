@@ -1,53 +1,106 @@
-# Ahoum Grocery App
+# Ahoum Grocery Delivery
 
-A responsive frontend e-commerce prototype built for the Ahoum Frontend Developer Candidate Assignment. 
+## Overview
 
-## Project Overview
-This application is a mock grocery delivery storefront. It demonstrates complex frontend state management, responsive UI design, and asynchronous API handling (including stale response protection) entirely in the browser using a mock JSON data layer.
+A mobile-first React grocery delivery prototype built for the Ahoum Frontend Developer Candidate Assignment. It follows the supplied Nectar-style Figma flow while preserving a responsive desktop adaptation and resilient client-side state.
 
-## Technology Stack
-- **Framework:** React 18
-- **Build Tool:** Vite
-- **Language:** TypeScript (Strict Mode)
-- **Styling:** Tailwind CSS v4
-- **State Management:** Zustand
-- **Routing:** React Router
+## Features
 
-## Setup Instructions
-1. Ensure you have Node.js installed (v18+ recommended).
-2. Clone or download this repository.
-3. Navigate to the project folder in your terminal:
-   ```bash
-   cd responsive-grocery-app
-   ```
-4. Install the dependencies:
-   ```bash
-   npm install
-   ```
+- Splash, onboarding, sign-in, phone, OTP, location, login, and signup entry flow.
+- Mobile-first Home catalog with promotional, offer, category, and product sections.
+- Category browsing and product detail pages.
+- Search with variable-latency mock API and stale-response protection.
+- Zustand cart with persistence, stock limits, and fresh-data reconciliation.
+- Persisted favorites.
+- Checkout with success and failure result routes.
+- Loading skeletons, empty states, and request error/retry states.
+- Fixed mobile bottom navigation with cart count.
+- Responsive desktop navigation, grids, cart, and checkout layout.
+- Keyboard-accessible links, controls, form labels, and visible focus states.
 
-## Run Instructions
-Start the local Vite development server:
+## Tech Stack
+
+- React 19
+- Vite
+- TypeScript strict mode
+- Tailwind CSS v4
+- Zustand
+- React Router
+- Lucide React
+
+## Getting Started
+
 ```bash
+npm install
 npm run dev
 ```
-Open the provided local URL (typically `http://localhost:5173`) in your browser.
 
-## Architecture Summary
-The project follows a modular, feature-separated architecture:
-- `src/components/`: Reusable UI elements (`ProductCard`, `Layout` navbar).
-- `src/pages/`: Main route views (`Home`, `Cart`, `Checkout`, `ProductDetail`).
-- `src/store/`: Zustand global state management (`cartStore.ts`) with localStorage persistence and validation logic.
-- `src/services/`: Mock API layer that simulates network latency and handles searching/fetching.
-- `src/hooks/`: Custom React hooks, including `useSearchProducts` which implements a cleanup pattern to prevent stale response race conditions.
-- `src/data/`: Static `products.json` acting as the mock database.
+Validation commands:
+
+```bash
+npm run build
+npm run lint
+```
+
+## Routes
+
+Storefront: `/`, `/explore`, `/category/:category`, `/search`, `/product/:id`, `/cart`, `/favorites`, `/account`, `/checkout`, `/checkout/success`, `/checkout/failure`.
+
+Entry flow: `/splash`, `/onboarding`, `/signin`, `/phone`, `/verification`, `/location`, `/login`, `/signup`.
+
+## Architecture
+
+- `src/components/`: Layout, mobile navigation, product cards, category tiles, section headers, and horizontal product rows.
+- `src/pages/`: Route-level storefront and authentication screens.
+- `src/store/`: Separate persisted Zustand stores for cart, favorites, and session/location state.
+- `src/services/api.ts`: Mock product API with variable latency.
+- `src/hooks/useSearchProducts.ts`: Async search state and stale-response protection.
+- `src/data/products.json`: Canonical 32-product catalog.
+- `public/products/`: Local product imagery used by canonical records.
+
+## State Management
+
+Cart state is kept in `cartStore.ts`. It supports add, remove, quantity updates, persistence, stock limits, and `syncCart` reconciliation. Favorites and entry/location session state use separate persisted Zustand stores. No backend or Context API is used.
+
+## Search Architecture
+
+Search input updates `useSearchProducts`, which calls the mock API. The API simulates 200-1200ms latency. The hook marks its previous effect as stale during cleanup, so an older response cannot overwrite a newer query. Home and Search expose explicit retry actions.
+
+## Cart Persistence
+
+Persisted cart snapshots render immediately, then fresh API data reconciles them. Unknown or zero-stock products are removed, current product fields and prices replace stale values, and quantities are capped to current stock. Quantity updates never allow values below one.
+
+## Responsive Design
+
+Mobile uses compact cards, horizontal product rows, a fixed five-item bottom nav, and a padded scroll area so content is not covered. Desktop uses centered max-width containers, navigation links, four-column product grids where space permits, and a side-by-side sticky cart summary.
+
+## UX States
+
+Data-driven screens provide skeleton loading states, empty states for carts/search/favorites/categories, and meaningful request error states with functional Retry buttons.
+
+## Accessibility
+
+Primary interactions use semantic links, buttons, labels, `aria-label` values where needed, keyboard focus styles, and accessible quantity, favorite, cart, and navigation controls.
+
+## Testing / Verification
+
+- `npm run build` passes.
+- `npm run lint` passes.
+- Catalog audit verifies 32 unique IDs, required fields, local image paths, and existing image files.
+- Browser checks covered the authentication flow, Home, mobile bottom navigation destinations, cart count, product routes, and local image loading.
+- Stale search protection is reproducibly exercised by changing queries quickly; the hook logs `[Stale Response Prevented]` for a cleaned-up request. No deterministic automated test is currently committed.
 
 ## Known Limitations
-- **Mock Data Only:** The checkout process is simulated. No real payments are processed.
-- **Cart Sync on Load:** The cart synchronizes with the "server" (JSON file) on initial app load. If a product price changes on the server *while* the user is actively browsing without refreshing, they will see the old price until they refresh. Realtime WebSockets would solve this in a production app.
-- **Local Images:** Some product images rely on Unsplash URLs which require an internet connection to render.
 
-## What I would improve with another day
-1. **Debouncing:** Add a `useDebounce` hook to the search bar so it waits 300ms after the user stops typing before hitting the mock API. This saves network bandwidth.
-2. **Animations & Polish:** Add Framer Motion to animate items sliding in and out of the cart, and create a more complex skeleton loading cascade.
-3. **Pagination:** The current mock API returns all products. For a real app, I would implement cursor-based pagination or infinite scroll for the Home catalog.
-4. **Toast Notifications:** Add a global toast system to give the user immediate visual feedback when an item is added to the cart (instead of relying entirely on the nav badge).
+- Product data and checkout are mocked; no backend or real payment provider exists.
+- The demo OTP is fixed at `1234`.
+- Exact original Figma assets were not available, so local visually appropriate grocery images and a reusable logo approximation are used.
+- Stale-response verification is a reproducible browser check rather than an automated test.
+
+## What I Would Improve With Another Day
+
+1. Add deterministic unit tests for stale search ordering and cart reconciliation.
+2. Add a real filter screen with multiple persisted filter dimensions.
+3. Refine typography and spacing against pixel-level Figma measurements.
+4. Add product image optimization and responsive image sources.
+5. Add checkout form validation and a mock order service with retryable failures.
