@@ -1,4 +1,6 @@
+import { useState, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
+import { Plus } from 'lucide-react';
 import type { Product } from '../types';
 import { useCartStore } from '../store/cartStore';
 
@@ -8,8 +10,9 @@ interface ProductCardProps {
 
 export const ProductCard = ({ product }: ProductCardProps) => {
   const addItem = useCartStore((state) => state.addItem);
+  const [imageFailed, setImageFailed] = useState(false);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); // Prevent navigating to detail page if clicked on button
     addItem(product);
     // In a real app we might show a toast notification here
@@ -18,32 +21,34 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link 
       to={`/product/${product.id}`}
-      className="border border-gray-200 rounded-2xl p-4 shadow-sm hover:shadow-lg hover:border-green-300 transition-all bg-white flex flex-col h-full group focus-visible:ring-2 focus-visible:ring-green-500 outline-none"
+      className="focus-ring group flex h-full flex-col rounded-xl border border-[#edf0ec] bg-white p-2.5 shadow-[0_3px_14px_rgba(46,78,52,0.04)] transition hover:-translate-y-0.5"
     >
-      <div className="relative overflow-hidden rounded-xl mb-4 bg-gray-50 flex-shrink-0">
-        <img 
+      <div className="relative mb-3 flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded-[18px] bg-[#f2f6ef]">
+        {!imageFailed ? <img
           src={product.image} 
           alt={product.name} 
-          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-        />
+          onError={() => setImageFailed(true)}
+          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        /> : <span className="px-4 text-center text-xs font-bold text-[#789078]">Image unavailable</span>}
         {product.stock === 0 && (
-          <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            Out of Stock
+          <div className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold text-[#d86f4d]">
+            Sold out
           </div>
         )}
       </div>
       
       <div className="flex flex-col flex-grow">
-        <p className="text-gray-500 text-xs font-medium uppercase tracking-wider mb-1">{product.category}</p>
-        <h2 className="font-semibold text-gray-900 text-lg mb-2 line-clamp-2">{product.name}</h2>
-        <div className="mt-auto flex items-center justify-between">
-          <p className="font-bold text-xl text-gray-900">${product.price.toFixed(2)}</p>
+        <p className="mb-0.5 truncate text-[10px] text-[#9ca69e]">{product.category} · {product.unit}</p>
+        <h2 className="mb-3 line-clamp-2 text-[13px] font-bold leading-4 text-[#26322b]">{product.name}</h2>
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <p className="text-sm font-extrabold text-[#26322b]">${product.price.toFixed(2)}</p>
           <button 
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-green-500 outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+            aria-label={`Add ${product.name} to cart`}
+            className="focus-ring flex h-8 w-8 items-center justify-center rounded-full bg-[#55b978] text-white transition hover:bg-[#429e65] disabled:bg-[#d7ddd8]"
           >
-            Add
+            <Plus size={18} />
           </button>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { ArrowLeft, Check, Heart, Minus, Plus, ShoppingCart } from 'lucide-react';
 import type { Product } from '../types';
 import { api } from '../services/api';
 import { useCartStore } from '../store/cartStore';
+import { useFavoritesStore } from '../store/favoritesStore';
 
 export const ProductDetail = () => {
   const { id } = useParams();
@@ -11,6 +13,10 @@ export const ProductDetail = () => {
   const [error, setError] = useState<string | null>(null);
   
   const addItem = useCartStore((state) => state.addItem);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const cartItem = useCartStore((state) => state.items.find((item) => item.id === id));
+  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const isFavorite = useFavoritesStore((state) => id ? state.productIds.includes(id) : false);
 
   useEffect(() => {
     if (!id) return;
@@ -24,7 +30,7 @@ export const ProductDetail = () => {
         } else {
           setError("Product not found");
         }
-      } catch (err) {
+      } catch {
         setError("Failed to load product details");
       } finally {
         setLoading(false);
@@ -60,53 +66,46 @@ export const ProductDetail = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
-      <Link to="/" className="inline-flex items-center text-gray-500 hover:text-green-600 mb-6 transition-colors">
-        <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Catalog
-      </Link>
-      
-      <div className="bg-white rounded-3xl p-6 md:p-10 shadow-sm border border-gray-100 flex flex-col md:flex-row gap-10">
-        <div className="w-full md:w-1/2 relative rounded-2xl overflow-hidden bg-gray-50">
+    <div className="mx-auto max-w-5xl">
+      <div className="mb-4 flex items-center justify-between"><Link to="/" className="focus-ring rounded-lg p-2 text-[#26322b]" aria-label="Back to shop"><ArrowLeft size={20} /></Link><button onClick={() => id && toggleFavorite(id)} className={`focus-ring rounded-full p-2 ${isFavorite ? 'text-[#55b978]' : 'text-[#7d8980]'}`} aria-label={isFavorite ? 'Remove from favourites' : 'Add to favourites'}><Heart size={21} fill={isFavorite ? 'currentColor' : 'none'} /></button></div>
+      <div className="overflow-hidden rounded-2xl border border-[#edf0ec] bg-white md:grid md:grid-cols-2">
+        <div className="relative aspect-square bg-[#f2f6ef]">
           <img 
             src={product.image} 
             alt={product.name} 
-            className="w-full h-full object-cover max-h-[500px]"
+            className="h-full w-full object-cover"
           />
           {product.stock === 0 && (
-            <div className="absolute top-4 right-4 bg-red-500 text-white font-bold px-4 py-2 rounded-full shadow-md">
+            <div className="absolute right-4 top-4 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-[#d86f4d] shadow-sm">
               Out of Stock
             </div>
           )}
         </div>
         
-        <div className="w-full md:w-1/2 flex flex-col justify-center">
-          <p className="text-green-600 font-semibold uppercase tracking-wider mb-2">{product.category}</p>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
-          
-          <div className="text-4xl font-extrabold text-gray-900 mb-6">
+        <div className="flex flex-col p-5 sm:p-10">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-[#55b978]">{product.category}</p>
+          <h1 className="mb-2 text-3xl font-extrabold leading-tight tracking-[-0.05em] text-[#26322b]">{product.name}</h1>
+          <p className="mb-4 text-xs text-[#89948c]">{product.unit}</p>
+          <div className="mb-5 flex items-center justify-between text-2xl font-extrabold text-[#26322b]">
             ${product.price.toFixed(2)}
+            <div className="flex items-center rounded-xl border border-[#e2eae0] text-sm"><button onClick={() => cartItem && updateQuantity(product.id, cartItem.quantity - 1)} className="focus-ring rounded-l-xl p-2 text-[#77827a]" aria-label="Decrease quantity"><Minus size={15} /></button><span className="w-7 text-center">{cartItem?.quantity ?? 1}</span><button onClick={() => cartItem ? updateQuantity(product.id, cartItem.quantity + 1) : addItem(product)} disabled={cartItem?.quantity === product.stock} className="focus-ring rounded-r-xl p-2 text-[#55b978] disabled:opacity-40" aria-label="Increase quantity"><Plus size={15} /></button></div>
           </div>
           
-          <div className="prose text-gray-600 mb-8">
-            <p className="text-lg leading-relaxed">{product.description}</p>
+          <div className="mb-8 text-[#7b867e]">
+            <p className="text-sm leading-6">{product.description}</p>
           </div>
           
-          <div className="flex items-center gap-4 text-sm text-gray-500 mb-6 bg-gray-50 p-4 rounded-xl">
-            <svg className="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+          <div className="mb-6 flex items-center gap-3 rounded-2xl bg-[#f2f8ef] p-4 text-sm text-[#718075]">
+            <Check className="text-[#55b978]" size={19} />
             <span>{product.stock > 0 ? `${product.stock} items available in stock` : 'Currently unavailable'}</span>
           </div>
 
-          <button 
+          <button
             onClick={() => addItem(product)}
             disabled={product.stock === 0}
-            className="w-full bg-green-600 text-white text-lg font-semibold py-4 rounded-xl hover:bg-green-700 transition-colors focus:ring-4 focus:ring-green-200 outline-none disabled:bg-gray-300 disabled:cursor-not-allowed shadow-md hover:shadow-lg disabled:shadow-none"
+            className="focus-ring flex w-full items-center justify-center gap-2 rounded-2xl bg-[#55b978] py-4 text-sm font-bold text-white shadow-[0_8px_18px_rgba(85,185,120,0.2)] hover:bg-[#429e65] disabled:bg-[#d7ddd8] disabled:shadow-none"
           >
-            {product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            <ShoppingCart size={18} />{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
           </button>
         </div>
       </div>

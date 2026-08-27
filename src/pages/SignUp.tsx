@@ -1,0 +1,12 @@
+import { useState, type FormEvent } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useSessionStore } from '../store/sessionStore';
+
+export const SignUp = () => {
+  const navigate = useNavigate();
+  const signIn = useSessionStore((state) => state.signIn);
+  const [submitted, setSubmitted] = useState(false);
+  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); signIn(); setSubmitted(true); navigate('/', { replace: true }); };
+  return <main className="min-h-screen bg-[#fcfdfb] px-6 pb-[env(safe-area-inset-bottom)] pt-7 text-[#26322b]"><div className="mx-auto flex min-h-[calc(100vh-1.75rem)] w-full max-w-md flex-col"><button onClick={() => navigate('/signin')} className="focus-ring -ml-2 flex w-fit rounded-lg p-2 text-[#69746c]" aria-label="Back to sign in"><ArrowLeft size={20} /></button><div className="mt-10"><h1 className="text-2xl font-extrabold tracking-[-0.04em]">Sign Up</h1><p className="mt-2 text-xs text-[#89948c]">Create an account to continue.</p></div><form onSubmit={submit} className="mt-8 space-y-4"><label className="block text-xs font-semibold text-[#69746c]">Username<input required className="focus-ring mt-2 w-full rounded-xl border border-[#e2eae0] bg-white px-4 py-3 text-sm outline-none focus:border-[#55b978]" /></label><label className="block text-xs font-semibold text-[#69746c]">Email<input required type="email" className="focus-ring mt-2 w-full rounded-xl border border-[#e2eae0] bg-white px-4 py-3 text-sm outline-none focus:border-[#55b978]" /></label><label className="block text-xs font-semibold text-[#69746c]">Password<input required type="password" className="focus-ring mt-2 w-full rounded-xl border border-[#e2eae0] bg-white px-4 py-3 text-sm outline-none focus:border-[#55b978]" /></label><p className="text-[10px] leading-4 text-[#89948c]">By continuing you agree to our <span className="text-[#55b978]">Terms of Service</span> and <span className="text-[#55b978]">Privacy Policy</span>.</p><button type="submit" className="focus-ring w-full rounded-xl bg-[#55b978] py-4 text-sm font-bold text-white">Sign Up</button></form><p className="mt-auto pb-5 pt-10 text-center text-xs text-[#89948c]">Already have an account? <button onClick={() => navigate('/login')} className="focus-ring rounded font-bold text-[#55b978]">Login</button></p>{submitted && <span className="sr-only">Account created</span>}</div></main>;
+};

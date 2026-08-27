@@ -6,6 +6,7 @@ export const useSearchProducts = (query: string) => {
   const [results, setResults] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     // This is the core fix for "Stale Responses".
@@ -27,7 +28,7 @@ export const useSearchProducts = (query: string) => {
         } else {
           console.log(`[Stale Response Prevented] Ignored results for: "${query}"`);
         }
-      } catch (err) {
+      } catch {
         if (!ignore) {
           setError('Failed to fetch products. Please try again.');
         }
@@ -43,7 +44,7 @@ export const useSearchProducts = (query: string) => {
     return () => {
       ignore = true; // Cleanup function that marks this run as stale
     };
-  }, [query]);
+  }, [query, retryCount]);
 
-  return { results, loading, error, setResults };
+  return { results, loading, error, setResults, retry: () => setRetryCount((count) => count + 1) };
 };

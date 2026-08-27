@@ -1,162 +1,61 @@
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { MapPin, Search } from 'lucide-react';
 import { useSearchProducts } from '../hooks/useSearchProducts';
-import { api } from '../services/api';
-import { ProductCard } from '../components/ProductCard';
+import { HorizontalProductRow } from '../components/HorizontalProductRow';
+import { SectionHeader } from '../components/SectionHeader';
+import { CategoryTile } from '../components/CategoryTile';
+
+const groceryCategories = [
+  { name: 'Pulses', category: 'Pantry', image: '/products/pulses.jpg', tone: 'bg-[#fff0df]' },
+  { name: 'Rice', category: 'Pantry', image: '/products/rice.jpg', tone: 'bg-[#e9f4e7]' },
+  { name: 'Fresh Produce', category: 'Produce', image: '/products/carrots.jpg', tone: 'bg-[#fbe8df]' },
+];
 
 export const Home = () => {
   const [query, setQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  
-  const { results, loading, error, setResults } = useSearchProducts(query);
-  const [demoStatus, setDemoStatus] = useState<string>('');
+  const { results, loading, error, retry } = useSearchProducts(query);
 
-  // Extract unique categories from results
-  const categories = useMemo(() => {
-    const cats = new Set(results.map(p => p.category));
-    return Array.from(cats);
-  }, [results]);
-
-  // Filter results by category if one is selected
-  const displayedResults = useMemo(() => {
-    if (!selectedCategory) return results;
-    return results.filter(p => p.category === selectedCategory);
-  }, [results, selectedCategory]);
-
-  const runStaleResponseDemo = async () => {
-    setDemoStatus('Running Demo... Check the console and UI.');
-    const slowPromise = new Promise<void>((resolve) => {
-      setTimeout(() => {
-        console.log("❌ SLOW request finished (milk). In a broken app, this would overwrite the screen!");
-        resolve();
-      }, 1500);
-    });
-
-    setTimeout(async () => {
-      const fastData = await api.searchProducts('bread');
-      console.log("✅ FAST request finished first (bread). Screen updates to bread.");
-      setResults(fastData); 
-      setDemoStatus('Demo complete. Screen correctly shows Bread, and Milk was ignored!');
-    }, 200);
-
-    await slowPromise;
-  };
+  const products = useMemo(() => results.filter((product) => product.stock > 0), [results]);
+  const exclusive = products.filter((product) => ['Organic Bananas', 'Natural Red Apple', 'Bell Pepper Red', 'Ginger'].includes(product.name));
+  const bestSelling = products.filter((product) => ['Natural Red Apple', 'Organic Bananas', 'Beef Bone', 'Broiler Chicken', 'Fresh Organic Milk'].includes(product.name));
+  const groceries = products.filter((product) => ['Beef Bone', 'Broiler Chicken', 'Rice', 'Pulses'].includes(product.name));
+  const produce = products.filter((product) => product.category === 'Produce');
+  const dairy = products.filter((product) => ['Dairy', 'Eggs'].includes(product.category));
+  const beverages = products.filter((product) => product.category === 'Beverages');
+  const bakery = products.filter((product) => ['Bakery', 'Snacks'].includes(product.category));
 
   return (
-    <div className="w-full">
-      {/* Header and Demo */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Fresh Groceries</h1>
-          <p className="text-gray-500 mt-1">Delivered directly to your door.</p>
-        </div>
-        <button 
-          onClick={runStaleResponseDemo}
-          className="bg-red-100 text-red-700 px-4 py-2 rounded-lg font-medium hover:bg-red-200 transition-colors focus:ring-2 focus:ring-red-500 focus:outline-none"
-        >
-          Run Stale Response Demo
-        </button>
-      </div>
+    <div className="animate-rise-in space-y-7">
+      <section>
+        <p className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#6d786f]"><MapPin size={13} fill="currentColor" />Dhaka, Banassree</p>
+        <label className="focus-within:ring-2 focus-within:ring-[#b9e8a6] mt-4 flex items-center gap-2 rounded-xl bg-[#f2f3f1] px-4 py-3"><Search size={18} className="text-[#69746c]" /><input aria-label="Search Store" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Store" className="min-w-0 flex-1 bg-transparent text-xs text-[#26322b] outline-none placeholder:text-[#9ca49d]" /></label>
+      </section>
 
-      {demoStatus && (
-        <div className="bg-blue-50 border border-blue-200 text-blue-800 p-4 mb-6 rounded-xl shadow-sm">
-          {demoStatus}
-        </div>
-      )}
+      <section className="relative min-h-32 overflow-hidden rounded-xl bg-[#eef8e9] px-5 py-4">
+        <div className="relative z-10 max-w-[58%]"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#55a66b]">Fresh picks</p><h1 className="mt-1 text-xl font-extrabold leading-6 text-[#26382b]">Get up to 40% off</h1><p className="mt-1 text-[10px] text-[#718075]">On selected fruits and vegetables</p></div>
+        <img src="/products/carrots.jpg" alt="Fresh vegetables" className="absolute -bottom-5 -right-2 h-32 w-40 rounded-full object-cover" />
+      </section>
 
-      {/* Search and Filter */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row gap-4 items-center">
-        <div className="w-full md:flex-1 relative">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-            </svg>
-          </div>
-          <input 
-            type="text"
-            placeholder="Search for milk, bananas..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-          />
-        </div>
-        
-        {/* Category Pills */}
-        <div className="w-full md:w-auto flex overflow-x-auto pb-2 md:pb-0 gap-2 hide-scrollbar">
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-green-500 outline-none ${
-              selectedCategory === null 
-                ? 'bg-green-600 text-white' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            All
-          </button>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-green-500 outline-none ${
-                selectedCategory === cat 
-                  ? 'bg-green-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
+      <section>
+        <SectionHeader title="Exclusive Offer" to="/category/Produce" />
+        <HorizontalProductRow products={exclusive} loading={loading} />
+      </section>
 
-      {/* States: Loading, Error, Empty */}
-      {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-            <div key={i} className="animate-pulse bg-white border border-gray-100 rounded-2xl p-4 h-80 flex flex-col">
-              <div className="bg-gray-200 h-48 rounded-xl mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="mt-auto flex justify-between">
-                <div className="h-6 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-10 bg-gray-200 rounded w-1/3"></div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <section><SectionHeader title="Best Selling" to="/search" /><HorizontalProductRow products={bestSelling} loading={loading} /></section>
 
-      {error && (
-        <div className="bg-red-50 text-red-600 p-6 rounded-xl text-center">
-          <p className="font-medium text-lg">{error}</p>
-          <button 
-            onClick={() => setQuery(query)} // trigger re-render/fetch
-            className="mt-4 bg-red-100 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
-      )}
+      <section>
+        <SectionHeader title="Groceries" to="/explore" />
+        <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-3">{groceryCategories.map((category) => <CategoryTile key={category.name} {...category} />)}</div>
+        <HorizontalProductRow products={groceries} loading={loading} />
+      </section>
 
-      {!loading && !error && displayedResults.length === 0 && (
-        <div className="text-center py-16 bg-gray-50 rounded-2xl border border-gray-100">
-          <div className="text-gray-400 mb-2">
-            <svg className="w-16 h-16 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-medium text-gray-900 mb-1">No products found</h3>
-          <p className="text-gray-500">Try adjusting your search or category filter.</p>
-        </div>
-      )}
+      <section><SectionHeader title="Fresh Produce" to="/category/Produce" /><HorizontalProductRow products={produce} loading={loading} /></section>
+      <section><SectionHeader title="Dairy & Eggs" to="/category/Dairy" /><HorizontalProductRow products={dairy} loading={loading} /></section>
+      <section><SectionHeader title="Beverages" to="/category/Beverages" /><HorizontalProductRow products={beverages} loading={loading} /></section>
+      <section><SectionHeader title="Bakery & Snacks" to="/category/Bakery" /><HorizontalProductRow products={bakery} loading={loading} /></section>
 
-      {/* Product Grid */}
-      {!loading && !error && displayedResults.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {displayedResults.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
+      {error && <div className="rounded-xl border border-[#f4d5c9] bg-[#fff7f3] p-6 text-center text-[#c86f4e]"><p className="font-bold">Something went wrong</p><button onClick={retry} className="focus-ring mt-2 rounded-lg font-bold underline">Retry</button></div>}
+      {!loading && !error && products.length === 0 && <div className="rounded-xl border border-dashed border-[#dce6da] bg-white px-5 py-12 text-center"><Search className="mx-auto mb-3 text-[#b6c1b8]" size={34} /><h3 className="font-extrabold text-[#26322b]">No products found</h3><p className="mt-1 text-sm text-[#8a958d]">Try another search.</p></div>}
     </div>
   );
 };

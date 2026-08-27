@@ -1,0 +1,11 @@
+import { useState, type FormEvent } from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+export const Verification = () => {
+  const navigate = useNavigate();
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const submit = (event: FormEvent<HTMLFormElement>) => { event.preventDefault(); if (!/^\d{4}$/.test(code)) { setError('Enter the 4-digit demo code.'); return; } if (code !== '1234') { setError('Demo code is 1234.'); return; } navigate('/location'); };
+  return <main className="min-h-screen bg-[#fcfdfb] px-6 pb-[env(safe-area-inset-bottom)] pt-7 text-[#26322b]"><div className="mx-auto flex min-h-[calc(100vh-1.75rem)] w-full max-w-md flex-col"><button onClick={() => navigate('/phone')} className="focus-ring -ml-2 flex w-fit rounded-lg p-2 text-[#69746c]" aria-label="Back to mobile number"><ArrowLeft size={20} /></button><div className="mt-12"><h1 className="text-2xl font-extrabold tracking-[-0.04em]">Enter your 4-digit code</h1><p className="mt-2 text-xs text-[#89948c]">Use the demo code sent to your phone.</p></div><form onSubmit={submit} className="mt-10"><label className="text-xs font-semibold text-[#69746c]">Code<input autoFocus required inputMode="numeric" maxLength={4} pattern="[0-9]{4}" value={code} onChange={(event) => { setCode(event.target.value.replace(/\D/g, '')); setError(''); }} aria-label="4-digit verification code" placeholder="- - - -" className="mt-3 w-full border-b border-[#dfe8dc] bg-transparent py-3 text-lg tracking-[0.8em] outline-none placeholder:text-[#b0b8b1]" /></label>{error && <p role="alert" className="mt-3 text-xs font-semibold text-[#d86f4d]">{error}</p>}<button type="button" onClick={() => setError('A new demo code is still 1234.')} className="focus-ring mt-24 rounded font-semibold text-xs text-[#55b978]">Resend Code</button><button type="submit" className="focus-ring ml-auto mt-5 flex h-14 w-14 items-center justify-center rounded-full bg-[#55b978] text-white" aria-label="Continue to location"><ArrowRight size={21} /></button></form><div className="mx-auto mt-auto h-1 w-32 rounded-full bg-[#d8ded9]" aria-hidden="true" /></div></main>;
+};

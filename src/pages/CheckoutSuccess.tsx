@@ -1,25 +1,18 @@
 import { Link } from 'react-router-dom';
+import { Check, ShoppingBag } from 'lucide-react';
 
 export const CheckoutSuccess = () => {
   return (
-    <div className="max-w-2xl mx-auto py-16 px-4 text-center">
-      <div className="bg-white rounded-3xl p-10 shadow-sm border border-gray-100 flex flex-col items-center">
-        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-          <svg className="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Confirmed!</h1>
-        <p className="text-gray-500 mb-8 max-w-md">
-          Thank you for shopping with Ahoum Grocery. Your order has been successfully placed and will be processed shortly.
-        </p>
+    <div className="animate-rise-in mx-auto flex max-w-md flex-col items-center py-12 text-center lg:py-20">
+        <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#e4f5df] text-[#55b978]"><Check size={38} strokeWidth={3} /></div>
+        <p className="mb-2 text-sm font-bold uppercase tracking-[0.14em] text-[#55b978]">Order confirmed</p>
+        <h1 className="mb-3 text-3xl font-extrabold tracking-[-0.05em] text-[#26322b]">Your groceries are on the way</h1>
+        <p className="mb-8 text-sm leading-6 text-[#7b867e]">Thanks for shopping with ahoum. We will prepare your order and keep you posted.</p>
         <Link 
           to="/" 
-          className="bg-green-600 text-white font-semibold py-3 px-8 rounded-xl hover:bg-green-700 transition-colors shadow-md hover:shadow-lg"
-        >
-          Continue Shopping
+          className="focus-ring flex items-center gap-2 rounded-2xl bg-[#55b978] px-7 py-3.5 text-sm font-bold text-white shadow-[0_8px_18px_rgba(85,185,120,0.22)] hover:bg-[#429e65]"
+        ><ShoppingBag size={17} />Continue shopping
         </Link>
-      </div>
     </div>
   );
 };
