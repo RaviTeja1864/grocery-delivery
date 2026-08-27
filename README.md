@@ -30,7 +30,11 @@ A mobile-first React grocery delivery prototype built for the Ahoum Frontend Dev
 
 ## Getting Started
 
+Repository: `grocery-delivery`
+
 ```bash
+git clone https://github.com/RaviTeja1864/grocery-delivery.git
+cd grocery-delivery
 npm install
 npm run dev
 ```
