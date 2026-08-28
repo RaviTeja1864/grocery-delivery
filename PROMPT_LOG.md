@@ -17,7 +17,7 @@ AI was used as an implementation and reasoning assistant. Final implementation c
 ## 1. Understand the assignment and learning order
 
 ### Prompt
-> This is the project I am going to work on. I am at zero. What technology stack do I need to master? Arrange everything in the order to learn it.
+> This is the project I am going to work on. I am at zero.Arrange everything in the order to learn it and understand the project.
 
 ### Follow-up
 > Is Tailwind CSS a framework inside React? Compare React/Tailwind concepts with Django concepts such as router, views, etc. How can I learn React, Tailwind CSS, Zustand, etc. now?
