@@ -1,58 +1,215 @@
-# Engineering Decisions
+# DECISIONS.md
 
-## Decision: Persisted cart reconciliation
+# Nectar — Engineering Decisions
+
+This document records non-trivial engineering decisions made during the project. Each decision includes the problem, alternatives considered, chosen approach, and trade-off.
+
+The decisions below are based on the actual development process rather than decisions that were simply required by the assignment.
+
+---
+
+## 1. Use screenshot references when direct Figma access was unavailable
 
 ### Problem / ambiguity
-Persisted cart entries can refer to deleted products, old prices, zero stock, or quantities above current stock.
+
+The assignment referred to a shared Figma file, but the design link/access was not usable during implementation. Figma MCP was configured and connected, but the original design could not be inspected because of access limitations.
 
 ### Options considered
-- Persist only IDs and quantities, then render after refetching.
-- Trust the persisted product snapshots.
-- Render persisted data immediately, then reconcile against fresh data.
 
-### Choice made
-The cart uses Zustand `persist` for immediate restoration and `syncCart` after `api.getProducts()` resolves.
+1. Wait for or request edit/access permissions.
+2. Implement the application without a visual reference.
+3. Use the supplied screenshots as the working design reference.
+
+### Decision
+
+Use the provided screenshots as the visual source for implementation while documenting that the original Figma file was not directly inspectable.
 
 ### Reasoning
-`syncCart` removes unknown and zero-stock products, replaces stale product fields including price, and caps quantity to fresh stock. Quantity updates also clamp to at least one and at most stock.
+
+The screenshots contained the relevant screens and visual hierarchy needed to implement the assignment. Continuing without a reference would have increased the risk of inventing the design.
 
 ### Trade-off
-The UI is fast on refresh, but a short period can exist before background synchronization completes.
 
-### Consequence
-Totals are calculated from the reconciled cart items rather than an independently cached total.
+The implementation could be close to the screenshots but could not guarantee pixel-level parity with the original Figma file.
 
-## Decision: Stale search protection
+---
 
-### Problem / ambiguity
-Variable mock latency lets an older query such as `milk` resolve after a newer query such as `apple`.
+## 2. Keep the application mobile-first but create a deliberate desktop adaptation
+
+### Problem
+
+The supplied design was mobile-first, while the assignment explicitly required desktop adaptation. Simply stretching the mobile UI would produce poor desktop composition.
 
 ### Options considered
-Abort requests, add debouncing, or ignore results from effects that have been cleaned up.
 
-### Choice made
-`useSearchProducts` uses an effect-local `ignore` flag. Cleanup marks the prior request stale; only the active effect may update results, errors, or loading state.
+1. Stretch the mobile layout across the desktop viewport.
+2. Keep a single narrow mobile-sized content area on desktop.
+3. Preserve mobile hierarchy and use a centered/max-width desktop layout with responsive grids and spacing.
+
+### Decision
+
+Use the third approach.
 
 ### Reasoning
-This is small, dependency-free, and directly protects every state update for the mock API.
+
+The mobile layout remains the primary visual reference, while desktop receives a wider content area, responsive product grids, and spacing appropriate for larger screens.
 
 ### Trade-off
-The mock promise still completes and consumes simulated time. A production API could additionally use `AbortController`.
 
-## Decision: Canonical product/image data
+Desktop cannot be an exact copy of the mobile screenshot because the available space and interaction model are different.
 
-### Problem / ambiguity
-Home, search, category, detail, cart, and favorites must not drift into separate product definitions.
+---
+
+## 3. Keep cart state in Zustand and persist it on the client
+
+### Problem
+
+Cart state needs to survive refreshes/reopening, and the assignment also asks for explicit handling of stale persisted data.
 
 ### Options considered
-Define products inside each screen, use image maps outside the product records, or keep one canonical JSON catalog.
 
-### Choice made
-`products.json` is the source of truth. Every view passes the same `Product` object and uses `product.image`, while cart synchronization refreshes that same object from the API.
+1. Keep cart state only in React component state.
+2. Store the cart only in local storage without a state store.
+3. Use Zustand for application state and persist the cart data.
 
-### Consequence
-A corrected image, price, unit, or stock value propagates to all screens without page-specific mapping changes.
+### Decision
 
-## Decision: Separate Zustand stores
+Use the existing Zustand cart architecture with persistence.
 
-The cart, favorites, and lightweight entry/location session use separate persisted Zustand stores. This keeps unrelated state boundaries explicit without introducing Context, Redux, or a backend.
+### Reasoning
+
+The cart is shared across multiple screens and must survive browser reloads. A dedicated store keeps cart operations separate from presentation components.
+
+### Trade-off
+
+Persisted client state can become stale when the source product dataset changes, so reconciliation is necessary rather than blindly trusting stored values.
+
+---
+
+## 4. Protect search state from stale asynchronous responses
+
+### Problem
+
+Search requests have variable latency. An older request can return after a newer request and overwrite the current search result.
+
+### Options considered
+
+1. Accept whichever request resolves last.
+2. Debounce input only.
+3. Track request/query identity and ignore responses that are no longer current.
+
+### Decision
+
+Use request identity/current-query protection so stale responses cannot replace newer search results.
+
+### Reasoning
+
+Debouncing reduces request frequency but does not by itself solve out-of-order responses. The actual correctness requirement is that an older response must not win after a newer request has started.
+
+### Trade-off
+
+The search implementation needs additional asynchronous bookkeeping, but the resulting behavior is deterministic.
+
+---
+
+## 5. Use mock JSON data instead of introducing a backend
+
+### Problem
+
+The assignment requires a frontend implementation and explicitly states that no backend is required.
+
+### Options considered
+
+1. Build a backend API.
+2. Hardcode product objects inside components.
+3. Keep product data in mock JSON and expose asynchronous mock API behavior where needed.
+
+### Decision
+
+Use mock JSON data with a small asynchronous layer for data-driven behavior.
+
+### Reasoning
+
+This keeps the project within the assignment scope while still allowing loading, failure, retry, and stale-response behavior to be demonstrated.
+
+### Trade-off
+
+The application does not provide real server-side persistence or real transactions.
+
+---
+
+## 6. Use local product images
+
+### Problem
+
+Product images initially contained incorrect or reused mappings.
+
+### Options considered
+
+1. Keep reused images.
+2. Use remote image URLs.
+3. Use dedicated local assets with semantic product-to-image mappings.
+
+### Decision
+
+Use dedicated local product assets.
+
+### Reasoning
+
+Local assets make the assignment deterministic and prevent external image availability from affecting the demo.
+
+### Trade-off
+
+The repository contains more image files and therefore has a larger asset footprint.
+
+---
+
+## 7. Preserve stable functionality instead of retaining risky optional UI experiments
+
+### Problem
+
+Several optional UI improvements were attempted late in the project, including a ProductCard animation, Product Detail animation, checkout bottom sheet, and filter drawer. Some of the overlay experiments did not behave correctly across viewport/zoom conditions.
+
+### Options considered
+
+1. Keep iterating until the optional UI matched the reference.
+2. Keep a partially working version.
+3. Revert the risky experiments and submit the stable required implementation.
+
+### Decision
+
+Revert the unstable optional changes.
+
+### Reasoning
+
+The assignment evaluates a working, well-reasoned solution. A visually ambitious feature that introduces responsive regressions is worse than a smaller stable implementation.
+
+### Trade-off
+
+Some reference-inspired UI polish is not present in the final stable version.
+
+---
+
+## 8. Keep the documentation truthful about AI usage
+
+### Problem
+
+The assignment explicitly evaluates AI supervision and asks for prompts, corrections, and examples of what AI got wrong.
+
+### Options considered
+
+1. Document only successful AI changes.
+2. Hide failed experiments.
+3. Document successful work, rejected suggestions, failures, corrections, and reverts.
+
+### Decision
+
+Document both accepted and rejected AI work.
+
+### Reasoning
+
+The development process included genuine cases where AI output was reviewed and rejected. Those cases are stronger evidence of supervision than a list of successful prompts alone.
+
+### Trade-off
+
+The documentation openly acknowledges imperfections and failed experiments instead of presenting an artificially perfect development history.

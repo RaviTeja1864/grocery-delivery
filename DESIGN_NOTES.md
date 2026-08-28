@@ -1,47 +1,81 @@
-# Design Notes
+# DESIGN_NOTES.md
 
-## Decision 1 - Mobile-first navigation
+# Nectar — Responsive Design Notes
 
-### Problem
-The Figma uses a fixed five-item mobile navigation while desktop needs more horizontal space and a different interaction pattern.
+The reference design is mobile-first. The desktop implementation therefore treats the mobile screens as the visual foundation while adapting layout and interaction density for larger screens.
 
-### Decision
-`MobileBottomNav` renders Shop, Explore, Cart, Favourite, and Account with Lucide line icons. It is fixed to the mobile viewport, hidden at the `md` breakpoint, and the shared `Layout` keeps a separate desktop navigation row.
+---
 
-### Reasoning
-The fixed bar keeps the primary grocery destinations available during vertical browsing. Route-aware matching also keeps product, category, and search pages associated with their parent destination.
+## 1. Navigation: mobile bottom navigation → desktop layout
 
-### Trade-off
-Mobile content needs bottom padding, and the navigation consumes some viewport height. Desktop gets a lighter header instead of duplicating the mobile bar.
+### Mobile decision
 
-## Decision 2 - Responsive product layout
+The mobile interface uses a fixed bottom navigation pattern for Shop, Explore, Cart, Favourite, and Account. This preserves the navigation hierarchy visible in the reference design.
 
-### Problem
-The reference uses compact horizontally browsable product cards on mobile, while a desktop screen can show more products at once.
+### Desktop adaptation
 
-### Decision
-`HorizontalProductRow` uses fixed-width cards in a horizontally scrollable row on mobile and becomes a four-column grid from the medium breakpoint upward. `ProductCard` owns all product rendering and the real Zustand add action.
+Desktop has substantially more horizontal space and does not need the same persistent bottom-navigation treatment. The layout therefore uses a wider content area and desktop-appropriate navigation positioning rather than stretching the mobile bottom navigation across the page.
 
 ### Reasoning
-Fixed mobile card widths preserve readable product names and touch targets. The desktop grid increases product density without stretching cards to an awkward size.
+
+A fixed bottom bar is efficient on a phone because primary navigation is reachable with a thumb. On desktop, permanently consuming horizontal/vertical space for the same pattern is less useful.
 
 ### Trade-off
-Mobile users scroll within sections as well as down the page. Desktop rows lose the horizontal browsing gesture in exchange for faster comparison.
 
-## Decision 3 - Desktop adaptation
+The navigation presentation differs between mobile and desktop, but the destinations and hierarchy remain consistent.
 
-### Problem
-A phone-sized Figma cannot be stretched across a desktop without creating excessive whitespace or oversized controls.
+---
 
-### Decision
-The app uses centered max-width containers, desktop navigation, multi-column product grids, and a side-by-side cart with a sticky order summary. Authentication screens retain a centered mobile-width layout on larger screens.
+## 2. Product layout: mobile cards → responsive product grid
+
+### Mobile decision
+
+Product cards remain compact and vertically stacked within a narrow viewport. Image, category/unit, name, price, and cart interaction retain the hierarchy of the reference.
+
+### Desktop adaptation
+
+The available width is used for a multi-column product grid. The assignment specifically calls for at least four columns where space permits.
 
 ### Reasoning
-These adaptations preserve the mobile visual language while using desktop space for comparison and checkout efficiency.
+
+Keeping the mobile card width unchanged on desktop would waste space. A responsive grid lets the catalog become denser without changing the individual product information hierarchy.
 
 ### Trade-off
-Desktop does not reproduce the Figma frame literally. It prioritizes usable density and keeps the mobile hierarchy intact.
 
-## Decision 4 - Section composition
+The number of visible products per row changes with viewport width. This means the desktop screenshot cannot have exactly the same wrapping as mobile.
 
-Home is composed from reusable section headers, category tiles, and horizontal product rows. Each `See all` action routes to an existing category, Explore, or Search view instead of being decorative.
+---
+
+## 3. Content width and spacing: mobile edge-to-edge → desktop max-width
+
+### Mobile decision
+
+Content uses compact horizontal spacing suitable for phone screens while maintaining touch-friendly controls.
+
+### Desktop adaptation
+
+Desktop content is constrained by a max-width rather than expanding indefinitely across very wide monitors. Product grids, sections, and major controls use the available space inside that container.
+
+### Reasoning
+
+An unlimited desktop content width would create very long lines and oversized gaps. A max-width keeps the application readable and visually coherent.
+
+### Trade-off
+
+Very large monitors will have some surrounding whitespace rather than filling every pixel with application content.
+
+---
+
+## 4. Overlays and responsive experiments
+
+### Decision
+
+Optional Filter-drawer and Checkout-bottom-sheet experiments were not retained in the final stable implementation.
+
+### Reasoning
+
+The experiments demonstrated a practical responsive-design lesson: an overlay must adapt to viewport dimensions without changing the underlying page layout or becoming clipped at unusual zoom levels. The attempted implementations introduced presentation problems, including an incorrectly centered checkout modal and a filter action that was not reliably visible.
+
+### Trade-off
+
+The final submission contains less optional overlay polish, but the stable required application is not compromised by unfinished responsive behavior.
