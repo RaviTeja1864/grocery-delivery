@@ -160,6 +160,66 @@ The project was returned to the previously working Cart → Checkout flow.
 
 This was a deliberate AI-supervision decision: keeping a stable existing flow was preferred to retaining a visually incorrect optional feature.
 
+## 9. Duplicate delivery locations on Home
+
+### Symptom
+
+Home displayed the original static `Dhaka, Banassree` label and a second dynamic address after address editing was added.
+
+### Diagnosis
+
+The dynamic link had initially been inserted outside the original location section instead of replacing the static label.
+
+### Fix
+
+The static paragraph was replaced with the single clickable address control. It now displays the persisted zone and optional area exactly once.
+
+### Verification
+
+The Home markup was searched for all location displays, then the project was rebuilt successfully.
+
+## 10. Back navigation for address changes
+
+### Symptom
+
+Opening the location form from Shop exposed a back button that returned the user to an inappropriate onboarding screen.
+
+### Fix
+
+The Location page hides its back button when the session is already complete. The initial verification-to-location flow still shows the control.
+
+### Verification
+
+The conditional JSX was validated with `npm run build`.
+
+## 11. Account entry back button
+
+### Symptom
+
+The Account page's authentication actions needed to open the shared Sign In screen without showing its onboarding back button.
+
+### Fix
+
+Account links navigate to `/signin` with a small `fromAccount` router state value. Sign In checks that value and hides only the top back control for that entry path.
+
+### Verification
+
+The navigation-state typing and conditional rendering were validated with `npm run build`.
+
+## 12. Static Home promotion
+
+### Symptom
+
+The Home promotion showed only one product and offer.
+
+### Fix
+
+The promotion was converted into a three-state carousel using local carrot, apple, and yogurt images. It advances every five seconds and cleans up its interval when Home unmounts.
+
+### Verification
+
+The carousel implementation passed the TypeScript and Vite production build.
+
 ---
 
 ## 7. AI-generated filter drawer caused responsive problems

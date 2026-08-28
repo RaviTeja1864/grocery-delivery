@@ -79,3 +79,59 @@ The experiments demonstrated a practical responsive-design lesson: an overlay mu
 ### Trade-off
 
 The final submission contains less optional overlay polish, but the stable required application is not compromised by unfinished responsive behavior.
+
+---
+
+## 5. Desktop navigation: keep search discoverable through Explore
+
+### Decision
+
+The desktop header shows Shop, Explore, Favourite, Account, and Cart. The standalone desktop Search link was removed because Explore already provides the product search field.
+
+### Reasoning
+
+This avoids presenting two competing search entry points while preserving the `/search` route, Search page, search hook, and mobile behavior.
+
+### Trade-off
+
+Desktop users reach the full search page through Explore rather than a dedicated header item.
+
+---
+
+## 6. Delivery address editing
+
+### Decision
+
+The Home delivery location is a single clickable control linked to `/location`. It displays the persisted zone and area from the session store when available.
+
+### Reasoning
+
+The existing location form already validates and saves the address, so reusing it keeps address changes consistent with onboarding.
+
+### Interaction detail
+
+When a returning user opens `/location` from Shop, the onboarding back button is hidden. The back button remains available during the initial verification-to-location flow.
+
+---
+
+## 7. Account access template
+
+### Decision
+
+The Account route uses a dedicated responsive access page with a primary login action, a secondary sign-up action, and a short list of account benefits.
+
+### Interaction detail
+
+Both Account actions open `/signin`, matching the shared sign-in screen. The sign-in back button is hidden only when that screen was reached from Account; direct onboarding access retains its back button.
+
+---
+
+## 8. Home promotional carousel
+
+### Decision
+
+The Home promotion is a three-state carousel featuring fresh produce savings, an apple offer, and a coming-soon dairy offer. It advances automatically every five seconds and also provides keyboard-accessible indicators for direct selection.
+
+### Reasoning
+
+Rotating the existing banner area adds promotional variety without increasing page height or changing the surrounding catalog structure.

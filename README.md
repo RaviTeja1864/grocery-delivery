@@ -15,7 +15,10 @@ A mobile-first React grocery delivery prototype built for the Ahoum Frontend Dev
 - Checkout with success and failure result routes.
 - Loading skeletons, empty states, and request error/retry states.
 - Fixed mobile bottom navigation with cart count.
-- Responsive desktop navigation, grids, cart, and checkout layout.
+- Responsive desktop navigation, grids, cart, and checkout layout, with Shop, Explore, Favourite, Account, and Cart actions.
+- Account access page with Login and Sign Up actions that open the existing sign-in flow.
+- Clickable delivery address on Home that opens the existing location form and updates from persisted session data.
+- Auto-rotating Home promotional banners with product imagery, offers, and coming-soon messaging every five seconds.
 - Keyboard-accessible links, controls, form labels, and visible focus states.
 
 ## Tech Stack
@@ -91,7 +94,7 @@ Primary interactions use semantic links, buttons, labels, `aria-label` values wh
 - `npm run build` passes.
 - `npm run lint` passes.
 - Catalog audit verifies 32 unique IDs, required fields, local image paths, and existing image files.
-- Browser checks covered the authentication flow, Home, mobile bottom navigation destinations, cart count, product routes, and local image loading.
+- Browser checks covered the authentication flow, Home, mobile bottom navigation destinations, Account access, address selection, cart count, product routes, promotional banners, and local image loading.
 - Stale search protection is reproducibly exercised by changing queries quickly; the hook logs `[Stale Response Prevented]` for a cleaned-up request. No deterministic automated test is currently committed.
 
 ## Known Limitations

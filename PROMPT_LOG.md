@@ -231,6 +231,71 @@ The repository was maintained with incremental commits rather than one artificia
 
 ---
 
+## 16. Desktop Account navigation
+
+### Prompt
+> Add an Account icon/link to the existing desktop header, pointing to `/account`, without changing the Account page itself or the routing architecture.
+
+### Outcome
+
+The desktop header received a Lucide Account icon and link to `/account`. The existing mobile Account navigation remained intact.
+
+## 17. Remove desktop Search navigation
+
+### Prompt
+> Remove only the Search link from the desktop header navigation. Keep the Search page, `/search` route, search logic, and mobile behavior unchanged. Explore already contains the search functionality. Do not modify anything else.
+
+### Outcome
+
+Only the desktop Search `NavLink` was removed from the shared layout. The Search page, route, logic, and mobile navigation were left unchanged.
+
+## 18. Make the Home location editable
+
+### Prompt
+> The location in this page make it as button so that i can change the delivery address.
+
+### Outcome
+
+The Home location became a clickable link to the existing `/location` form. The displayed address uses the persisted session zone and area, and the duplicate static location label was removed.
+
+## 19. Keep address-change navigation separate from onboarding
+
+### Prompt
+> When I click the location button from Shop the user should able to enter details and submit no back button should be there. If I open in a new browser logging in from there the back button should be visible to user.
+
+### Outcome
+
+The Location page hides its back button for completed sessions returning from Shop, while retaining it for the initial verification and login flow.
+
+## 20. Complete the Account section
+
+### Prompt
+> Complete the account section choose a template and update the accounts page. Keep a button in accounts page login to your account or signup to your account theme which navigates to login page.
+
+### Outcome
+
+A dedicated responsive Account page was added with Login and Sign Up actions, account benefits, and existing Nectar styling. The route now renders this page instead of the placeholder.
+
+## 21. Account actions open the shared Sign In screen
+
+### Prompt
+> After clicking buttons in account section navigate to this page and make sure if user comes to this page from account section no back button should be available.
+
+### Outcome
+
+Both Account actions now open `/signin` with navigation state identifying the Account origin. Sign In hides its back button for that origin while direct onboarding access still shows it.
+
+## 22. Auto-rotating Home banners
+
+### Prompt
+> Make this as banners auto moving for every 5 secs with different products, offers, coming soon offers etc.
+
+### Outcome
+
+The static Home promotion became a three-banner carousel with local product images, offer and coming-soon copy, five-second auto-rotation, and accessible manual indicators.
+
+---
+
 ## 16. README repository details
 
 ### Prompt

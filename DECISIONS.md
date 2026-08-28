@@ -213,3 +213,59 @@ The development process included genuine cases where AI output was reviewed and 
 ### Trade-off
 
 The documentation openly acknowledges imperfections and failed experiments instead of presenting an artificially perfect development history.
+
+## 9. Use Explore as the desktop search entry point
+
+### Problem
+
+The desktop header had a separate Search link even though Explore already contains the search interface.
+
+### Decision
+
+Remove only the desktop Search header link. Keep the Search page, `/search` route, search logic, and mobile navigation unchanged.
+
+### Trade-off
+
+Desktop navigation is simpler, but users must enter search through Explore.
+
+## 10. Reuse the location flow for address changes
+
+### Problem
+
+The Home location text needed to become an address-changing control without adding a second location form.
+
+### Decision
+
+Make the Home address a link to `/location` and use the persisted session store's zone and area values for its label.
+
+### Trade-off
+
+The existing onboarding form is reused for returning users, so it remains intentionally simple rather than becoming a separate address-management screen.
+
+## 11. Distinguish entry navigation from returning-user navigation
+
+### Problem
+
+The Location and Sign In screens need different back-button behavior depending on where the user came from.
+
+### Decision
+
+Use the existing persisted `entryComplete` state for Location and React Router navigation state for Account-to-SignIn navigation. Hide the back button only for those returning-user entry points.
+
+### Trade-off
+
+Navigation state is intentionally lightweight and only controls presentation; the route architecture remains unchanged.
+
+## 12. Rotate promotions within the existing Home banner
+
+### Problem
+
+The Home page had one static promotional banner.
+
+### Decision
+
+Keep the existing banner layout and rotate three local-image offers with a five-second interval, cleanup on unmount, and manual indicators.
+
+### Trade-off
+
+The carousel is client-side presentation only. It does not add backend promotion scheduling or product availability rules.
