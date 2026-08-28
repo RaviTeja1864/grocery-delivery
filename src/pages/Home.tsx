@@ -1,9 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { MapPin, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useSearchProducts } from '../hooks/useSearchProducts';
 import { HorizontalProductRow } from '../components/HorizontalProductRow';
 import { SectionHeader } from '../components/SectionHeader';
 import { CategoryTile } from '../components/CategoryTile';
+import { useSessionStore } from '../store/sessionStore';
 
 const groceryCategories = [
   { name: 'Pulses', category: 'Pantry', image: '/products/pulses.jpg', tone: 'bg-[#fff0df]' },
@@ -11,9 +13,24 @@ const groceryCategories = [
   { name: 'Fresh Produce', category: 'Produce', image: '/products/carrots.jpg', tone: 'bg-[#fbe8df]' },
 ];
 
+const banners = [
+  { eyebrow: 'Fresh picks', title: 'Get up to 40% off', description: 'On selected fruits and vegetables', image: '/products/carrots.jpg', alt: 'Fresh vegetables', tone: 'bg-[#eef8e9]' },
+  { eyebrow: 'Today only', title: 'Fresh apples, sweeter prices', description: 'Save on crisp red apples while stocks last', image: '/products/red-apple.jpg', alt: 'Red apples', tone: 'bg-[#fff1e8]' },
+  { eyebrow: 'Coming soon', title: 'A little more goodness', description: 'New dairy offers are arriving soon', image: '/products/yogurt.png', alt: 'Yogurt', tone: 'bg-[#eaf3fb]' },
+];
+
 export const Home = () => {
   const [query, setQuery] = useState('');
+  const [bannerIndex, setBannerIndex] = useState(0);
+  const { zone, area } = useSessionStore();
   const { results, loading, error, retry } = useSearchProducts(query);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setBannerIndex((currentIndex) => (currentIndex + 1) % banners.length);
+    }, 5000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const products = useMemo(() => results.filter((product) => product.stock > 0), [results]);
   const exclusive = products.filter((product) => ['Organic Bananas', 'Natural Red Apple', 'Bell Pepper Red', 'Ginger'].includes(product.name));
@@ -27,13 +44,15 @@ export const Home = () => {
   return (
     <div className="animate-rise-in space-y-7">
       <section>
-        <p className="flex items-center justify-center gap-1 text-[11px] font-semibold text-[#6d786f]"><MapPin size={13} fill="currentColor" />Dhaka, Banassree</p>
+        <Link to="/location" className="focus-ring mx-auto flex w-fit items-center justify-center gap-1 rounded-lg px-2 py-1 text-[11px] font-semibold text-[#6d786f] hover:text-[#55b978]" aria-label="Change delivery address"><MapPin size={13} fill="currentColor" />Dhaka, {zone || 'Banassree'}{area ? `, ${area}` : ''}</Link>
         <label className="focus-within:ring-2 focus-within:ring-[#b9e8a6] mt-4 flex items-center gap-2 rounded-xl bg-[#f2f3f1] px-4 py-3"><Search size={18} className="text-[#69746c]" /><input aria-label="Search Store" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search Store" className="min-w-0 flex-1 bg-transparent text-xs text-[#26322b] outline-none placeholder:text-[#9ca49d]" /></label>
       </section>
-
-      <section className="relative min-h-32 overflow-hidden rounded-xl bg-[#eef8e9] px-5 py-4">
-        <div className="relative z-10 max-w-[58%]"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#55a66b]">Fresh picks</p><h1 className="mt-1 text-xl font-extrabold leading-6 text-[#26382b]">Get up to 40% off</h1><p className="mt-1 text-[10px] text-[#718075]">On selected fruits and vegetables</p></div>
-        <img src="/products/carrots.jpg" alt="Fresh vegetables" className="absolute -bottom-5 -right-2 h-32 w-40 rounded-full object-cover" />
+      <section className={`relative min-h-32 overflow-hidden rounded-xl px-5 py-4 transition-colors duration-500 ${banners[bannerIndex].tone}`} aria-live="polite">
+        <div className="relative z-10 max-w-[58%]"><p className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#55a66b]">{banners[bannerIndex].eyebrow}</p><h1 className="mt-1 text-xl font-extrabold leading-6 text-[#26382b]">{banners[bannerIndex].title}</h1><p className="mt-1 text-[10px] text-[#718075]">{banners[bannerIndex].description}</p></div>
+        <img src={banners[bannerIndex].image} alt={banners[bannerIndex].alt} className="absolute -bottom-5 -right-2 h-32 w-40 rounded-full object-cover" />
+        <div className="absolute bottom-3 left-5 z-10 flex gap-1.5" aria-label="Promotional banners">
+          {banners.map((banner, index) => <button key={banner.title} type="button" onClick={() => setBannerIndex(index)} className={`focus-ring h-1.5 rounded-full transition-all ${index === bannerIndex ? 'w-5 bg-[#55b978]' : 'w-1.5 bg-[#b8d7b0]'}`} aria-label={`Show banner ${index + 1}`} aria-current={index === bannerIndex ? 'true' : undefined} />)}
+        </div>
       </section>
 
       <section>

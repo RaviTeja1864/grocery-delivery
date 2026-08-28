@@ -1,6 +1,6 @@
 
 import { Outlet, Link, NavLink } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, UserRound } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
 import { MobileBottomNav } from './MobileBottomNav';
 import { NectarLogo } from './NectarLogo';
@@ -16,8 +16,8 @@ export const Layout = () => {
         <nav className="hidden items-center gap-7 text-sm font-semibold text-[#758078] md:flex" aria-label="Desktop navigation">
           <NavLink to="/" end className={({ isActive }) => `focus-ring rounded-lg ${isActive ? 'text-[#55b978]' : 'hover:text-[#55b978]'}`}>Shop</NavLink>
           <NavLink to="/explore" className={({ isActive }) => `focus-ring rounded-lg ${isActive ? 'text-[#55b978]' : 'hover:text-[#55b978]'}`}>Explore</NavLink>
-          <NavLink to="/search" className={({ isActive }) => `focus-ring rounded-lg ${isActive ? 'text-[#55b978]' : 'hover:text-[#55b978]'}`}>Search</NavLink>
           <NavLink to="/favorites" className={({ isActive }) => `focus-ring rounded-lg ${isActive ? 'text-[#55b978]' : 'hover:text-[#55b978]'}`}>Favourite</NavLink>
+          <NavLink to="/account" aria-label="Account" className={({ isActive }) => `focus-ring flex items-center gap-1 rounded-lg ${isActive ? 'text-[#55b978]' : 'hover:text-[#55b978]'}`}><UserRound size={17} />Account</NavLink>
         </nav>
         <Link to="/cart" className="focus-ring relative rounded-lg p-2 text-[#26322b]" aria-label={`Cart with ${totalItems} items`}>
           <ShoppingCart size={21} />

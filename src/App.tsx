@@ -11,6 +11,7 @@ import { Explore } from './pages/Explore';
 import { CategoryListing } from './pages/CategoryListing';
 import { Search } from './pages/Search';
 import { Favorites } from './pages/Favorites';
+import { Account } from './pages/Account';
 import { Splash } from './pages/Splash';
 import { Onboarding } from './pages/Onboarding';
 import { Login } from './pages/Login';
@@ -55,7 +56,7 @@ function App() {
           <Route path="category/:category" element={<CategoryListing />} />
           <Route path="search" element={<Search />} />
           <Route path="favorites" element={<Favorites />} />
-          <Route path="account" element={<div className="py-12 text-center text-sm text-[#7b867e]">Account settings coming soon.</div>} />
+          <Route path="account" element={<Account />} />
           <Route path="product/:id" element={<ProductDetail />} />
           <Route path="cart" element={<Cart />} />
           <Route path="checkout" element={<Checkout />} />
