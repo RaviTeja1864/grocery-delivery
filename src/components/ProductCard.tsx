@@ -1,6 +1,6 @@
-import { useState, type MouseEvent } from 'react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Check, Plus } from 'lucide-react';
 import type { Product } from '../types';
 import { useCartStore } from '../store/cartStore';
 
@@ -11,11 +11,19 @@ interface ProductCardProps {
 export const ProductCard = ({ product }: ProductCardProps) => {
   const addItem = useCartStore((state) => state.addItem);
   const [imageFailed, setImageFailed] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const addedResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => {
+    if (addedResetTimer.current) clearTimeout(addedResetTimer.current);
+  }, []);
 
   const handleAddToCart = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); // Prevent navigating to detail page if clicked on button
     addItem(product);
-    // In a real app we might show a toast notification here
+    setJustAdded(true);
+    if (addedResetTimer.current) clearTimeout(addedResetTimer.current);
+    addedResetTimer.current = setTimeout(() => setJustAdded(false), 1250);
   };
 
   return (
@@ -41,15 +49,23 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         <p className="mb-0.5 truncate text-[10px] text-[#9ca69e]">{product.category} · {product.unit}</p>
         <h2 className="mb-3 line-clamp-2 text-[13px] font-bold leading-4 text-[#26322b]">{product.name}</h2>
         <div className="mt-auto flex items-center justify-between gap-2">
-          <p className="text-sm font-extrabold text-[#26322b]">${product.price.toFixed(2)}</p>
-          <button 
-            onClick={handleAddToCart}
-            disabled={product.stock === 0}
-            aria-label={`Add ${product.name} to cart`}
-            className="focus-ring flex h-8 w-8 items-center justify-center rounded-full bg-[#55b978] text-white transition hover:bg-[#429e65] disabled:bg-[#d7ddd8]"
-          >
-            <Plus size={18} />
-          </button>
+          <p className="shrink-0 text-sm font-extrabold text-[#26322b]">${product.price.toFixed(2)}</p>
+          <div className="flex min-w-0 flex-1 justify-end">
+            <button
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              aria-label={justAdded ? `Added ${product.name} to cart` : `Add ${product.name} to cart`}
+              className={`focus-ring relative flex h-8 w-full items-center justify-center overflow-hidden rounded-full bg-[#55b978] text-white transition-[max-width,transform,background-color] duration-250 ease-out hover:bg-[#429e65] active:scale-95 motion-reduce:transition-none disabled:bg-[#d7ddd8] ${justAdded ? 'max-w-full' : 'max-w-8'}`}
+            >
+              <span className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ease-out motion-reduce:transition-none ${justAdded ? 'scale-75 opacity-0' : 'scale-100 opacity-100'}`} aria-hidden="true">
+                <Plus size={18} />
+              </span>
+              <span className={`absolute inset-0 flex min-w-0 items-center justify-center gap-1.5 px-2 text-xs font-bold transition-all duration-200 ease-out motion-reduce:transition-none ${justAdded ? 'scale-100 opacity-100' : 'scale-105 opacity-0'}`} aria-hidden="true">
+                <Check className="shrink-0" size={16} />
+                <span className="truncate">Added to Cart</span>
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </Link>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Check, Heart, Minus, Plus, ShoppingCart } from 'lucide-react';
 import type { Product } from '../types';
@@ -11,6 +11,8 @@ export const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [justAdded, setJustAdded] = useState(false);
+  const addedResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   const addItem = useCartStore((state) => state.addItem);
   const updateQuantity = useCartStore((state) => state.updateQuantity);
@@ -39,6 +41,17 @@ export const ProductDetail = () => {
     
     fetchProduct();
   }, [id]);
+
+  useEffect(() => () => {
+    if (addedResetTimer.current) clearTimeout(addedResetTimer.current);
+  }, []);
+
+  const handleAddToCart = () => {
+    addItem(product!);
+    setJustAdded(true);
+    if (addedResetTimer.current) clearTimeout(addedResetTimer.current);
+    addedResetTimer.current = setTimeout(() => setJustAdded(false), 1500);
+  };
 
   if (loading) {
     return (
@@ -101,11 +114,21 @@ export const ProductDetail = () => {
           </div>
 
           <button
-            onClick={() => addItem(product)}
+            onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="focus-ring flex w-full items-center justify-center gap-2 rounded-2xl bg-[#55b978] py-4 text-sm font-bold text-white shadow-[0_8px_18px_rgba(85,185,120,0.2)] hover:bg-[#429e65] disabled:bg-[#d7ddd8] disabled:shadow-none"
+            aria-label={product.stock === 0 ? 'Out of Stock' : justAdded ? `Added ${product.name} to cart` : `Add ${product.name} to cart`}
+            className="focus-ring flex w-full items-center justify-center rounded-2xl bg-[#55b978] py-4 text-sm font-bold text-white shadow-[0_8px_18px_rgba(85,185,120,0.2)] transition-all duration-200 ease-out hover:bg-[#429e65] active:scale-[0.98] disabled:bg-[#d7ddd8] disabled:shadow-none"
           >
-            <ShoppingCart size={18} />{product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+            {product.stock === 0 ? 'Out of Stock' : (
+              <span className="relative h-[18px] w-[132px]" aria-hidden="true">
+                <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-all duration-200 ease-out ${justAdded ? 'scale-95 opacity-0' : 'scale-100 opacity-100'}`}>
+                  <ShoppingCart size={18} />Add to Cart
+                </span>
+                <span className={`absolute inset-0 flex items-center justify-center gap-2 transition-all duration-200 ease-out ${justAdded ? 'scale-100 opacity-100' : 'scale-105 opacity-0'}`}>
+                  <Check size={18} />Added to Cart
+                </span>
+              </span>
+            )}
           </button>
         </div>
       </div>

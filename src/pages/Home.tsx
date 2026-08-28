@@ -17,8 +17,8 @@ export const Home = () => {
 
   const products = useMemo(() => results.filter((product) => product.stock > 0), [results]);
   const exclusive = products.filter((product) => ['Organic Bananas', 'Natural Red Apple', 'Bell Pepper Red', 'Ginger'].includes(product.name));
-  const bestSelling = products.filter((product) => ['Natural Red Apple', 'Organic Bananas', 'Beef Bone', 'Broiler Chicken', 'Fresh Organic Milk'].includes(product.name));
-  const groceries = products.filter((product) => ['Beef Bone', 'Broiler Chicken', 'Rice', 'Pulses'].includes(product.name));
+  const bestSelling = products.filter((product) => ['Natural Red Apple', 'Organic Bananas', 'Mutton', 'Broiler Chicken', 'Fresh Organic Milk'].includes(product.name));
+  const groceries = products.filter((product) => ['Mutton', 'Broiler Chicken', 'Rice', 'Pulses'].includes(product.name));
   const produce = products.filter((product) => product.category === 'Produce');
   const dairy = products.filter((product) => ['Dairy', 'Eggs'].includes(product.category));
   const beverages = products.filter((product) => product.category === 'Beverages');
